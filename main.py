@@ -8,9 +8,9 @@ client = genai.Client(api_key=api_key)
 
 def extract_files(filepath):
     if os.path.exists(filepath):
-        files = os.listdir(filepath)
-        processed_files = [os.path.join(filepath, file) for file in files if file.endswith(".pdf")]
-        return processed_files
+        extracted_files = os.listdir(filepath)
+        processed_filess = [os.path.join(filepath, file) for file in extracted_files if file.endswith(".pdf")]
+        return processed_filess
     else:
         print(f"File path, {filepath} does not exist.")
         return None
@@ -26,27 +26,69 @@ def extract_text(file):
     reader.close()
     return list_of_strs
 
-def extract_text_from_pdf(files):
+def extract_text_from_pdf(file):
     list_of_strs = []
-    for file in range(len(files)):
-        try:
-            text = extract_text(files[file])
-            list_of_strs.extend(text)
-        except Exception as e:
-            print(f"Error while extracting text from the {file + 1} file: {e}")
-            continue
+    try:
+        text = extract_text(file)
+        list_of_strs.extend(text)
+    except Exception as e:
+        print(f"Error while extracting text from the file: {e}")
     return list_of_strs
 
 def process_text(sentences):
-    paragraph = ""
+    paragraphs = ""
     
     for sentence in sentences:
-        paragraph += sentence + "\n"
-    return paragraph
+        try:
+            paragraphs += sentence + "\n"
+        except Exception as e:
+            print(f"Error while processing sentence: {e}")
+    return paragraphs
 
-def summarize_pdf(paragraph):
-    response = client.models.generate_content(model=model, contents=f"{paragraph}")
-    print(response.text)
+def summarize_pdf(paragraphs):
+    try:
+        response = client.models.generate_content(model=model, contents=paragraphs)
+        print(response.text)
+    except Exception as e:
+        print(f"Error while summarizing PDF: {e}")
 
 if __name__ == "__main__":
-    files = extract_files()
+    files = extract_files("input")
+    if files:
+        try:
+            while True:
+                print("Welcome to the PDF Summarizer!")
+                print("Please select a option:")
+                print("1. Summarize a PDF")
+                print("2. Exit")
+                choice = input("Enter your option: ")
+                
+                if choice == "1":
+                    print("Choose a PDF to summarize:")
+                    for i, file in enumerate(files, 1):
+                        file = os.path.basename(file)
+                        print(f"{i}. {file}")
+                    pdf = input("Enter the number of the PDF to summarize: ")
+                    
+                    if pdf.isalpha():
+                        print("Invalid input. Please enter a number.")
+                        continue
+                    elif (int(pdf) - 1) > len(files):
+                        print("Invalid input. Please enter a valid number.")
+                        continue
+                    else:
+                        file = files[int(pdf) - 1]
+                        text = extract_text_from_pdf(file)
+                        paragraphs = process_text(text)
+                        print("Summarizing...")
+                        summarize_pdf(paragraphs)
+                elif choice == "2":
+                    print("Goodbye!")
+                    break
+                else:
+                    print("Invalid option. Please try again.")
+                    
+        except Exception as e:
+            print(f"Error while loading in the project.")
+    else:
+        print("No PDFs to summarize. (Place the PDFs in the 'input' folder.)")
