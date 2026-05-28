@@ -80,6 +80,3 @@ Once your dependencies are installed, look for the main Python file and type:
 python3 main.py
 (Note: If you are on Windows, you might need to type python main.py instead).
 ```
-
-## 🛠️ Step 5: How it works
-
