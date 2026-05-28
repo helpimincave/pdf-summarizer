@@ -43,3 +43,10 @@ def process_text(sentences):
     for sentence in sentences:
         paragraph += sentence + "\n"
     return paragraph
+
+def summarize_pdf(paragraph):
+    response = client.models.generate_content(model=model, contents=f"{paragraph}")
+    print(response.text)
+
+if __name__ == "__main__":
+    files = extract_files()
