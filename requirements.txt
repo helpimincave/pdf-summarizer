@@ -1,3 +1,3 @@
-requests
 fitz
 python-dotenv
+google-genai

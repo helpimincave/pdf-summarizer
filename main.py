@@ -1,7 +1,10 @@
-import requests, fitz, os, dotenv
+import fitz, os, dotenv
+from google import genai
 
 dotenv.load_dotenv()
 api_key = dotenv.get_key(".env", "GEMINI-API-KEY")
+model = "gemini-3.5-flash"
+client = genai.Client(api_key=api_key)
 
 def extract_files(filepath):
     if os.path.exists(filepath):
